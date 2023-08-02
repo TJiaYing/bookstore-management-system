@@ -2,39 +2,39 @@
 session_start(); // Start the session
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // Establish database connection
-  $servername = "localhost";
-  $username = "root";
-  $password = "";
-  $dbname = "bookstore";
+    // Establish database connection
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "bookstore";
 
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
-  // Retrieve form data
-  $email = $_POST['email'];
-  $password = $_POST['password'];
+    // Retrieve form data
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-  // Check if the user exists in the database
-  $sql = "SELECT * FROM tbl_users WHERE user_email='$email' AND user_password='$password'";
-  $result = $conn->query($sql);
+    // Check if the user exists in the database and retrieve the username
+    $sql = "SELECT * FROM tbl_users WHERE user_email='$email' AND user_password='$password'";
+    $result = $conn->query($sql);
 
-  if ($result->num_rows > 0) {
-    // Login successful
-    $_SESSION['email'] = $email; // Store the user's email in the session
-    header("Location: homepage.php"); // Redirect to the homepage
-    exit();
-  } else {
-    echo "Invalid email or password";
-}else {
-  echo "user not found";
-}
-
-  $conn->close();
+    if ($result->num_rows > 0) {
+        // Login successful
+        $user_data = $result->fetch_assoc();
+        $_SESSION['username'] = $user_data['user_name']; // Store the user's username in the session
+        $_SESSION['email'] = $email; // Store the user's email in the session
+        header("Location: homepage.php"); // Redirect to the homepage
+        exit();
+    } else {
+        echo "Invalid email or password";
+    }
+    $conn->close();
 }
 ?>
+
 
 
 <!DOCTYPE html>

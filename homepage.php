@@ -39,11 +39,31 @@
         // Display the user's information
         echo "<p>Welcome, $name!</p>";
         echo "<p>Email: $email</p>";
+        echo "<br>";
+        // Add the logout button
+        echo '<div class="text-center">';
+        echo '    <form action="homepage.php" method="post">';
+        echo '        <input type="hidden" name="logout" value="true">';
+        echo '        <input type="submit" class="btn btn-primary" value="Logout">';
+        echo '    </form>';
+        echo '</div>';
     } else {
         // If the user is not logged in or registered, show an empty message
         echo "<p>Please login or register to see your information.</p>";
     }
-    ?>
+    // Handle logout request
+    if (isset($_POST['logout']) && $_POST['logout'] === 'true') {
+        // Clear all session variables
+        $_SESSION = array();
+
+        // Destroy the session
+        session_destroy();
+
+        // Redirect the user to the homepage or login page
+        header("Location: homepage.php"); // Replace 'index.php' with your homepage URL
+        exit();
+    }
+?>
     </div>
   </section>
   <!------pengenalan------>
@@ -76,8 +96,8 @@
     </form>
 <?php
 function convertCurrency($amount, $fromCurrency, $toCurrency) {
-    $apiKey = 'fca_live_ZsI2JbPb6HpyaKwQsjDyt9S236nKNI0okT9Usk5J'; // Replace this with your actual API key from freecurrencyapi.com
-    $endpoint = "https://api.freecurrencyapi.com/v1/latest?base_currency={$fromCurrency}";
+    $apiKey = '5b2944abdb37a56b17d365aae3cff0a7'; // Replace this with your actual API key from freecurrencyapi.com
+    $endpoint = "http://api.exchangeratesapi.io/v1/";
 
     // Initialize the HTTP client
     $curl = curl_init();
@@ -129,19 +149,31 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Scan the "bookimages/" directory for image files
+$imagesDir = "bookimages/";
+$images = glob($imagesDir . "*.png");
+
 // Retrieve book information from the database
 $sql = "SELECT * FROM tbl_items"; // Change 'books' to your actual table name
 $result = $conn->query($sql);
 
-// Display book information
+// Display book information and images as individual cards
 if ($result->num_rows > 0) {
-  while ($row = $result->fetch_assoc()) {
-      echo '<div class="col-md-4 mb-3">';
-      echo '  <div class="card">';
-      echo '    <img src="bookimages/' . $row["bookimage"] . '" class="card-img-top" alt="' . $row["tmp_name"] . '">';
-      echo '    <div class="card-body">';
-      echo '      <h5 class="card-title">' . $row["item_name"] . '</h5>';
-      echo '      <p class="card-text">Book Price: RM ' . $row["item_price"] . '</p>';
+    while ($row = $result->fetch_assoc()) {
+        echo '<div class="container mb-4">';
+        echo '  <div class="row justify-content-center">';
+        echo '    <div class="col-8 col-md-6 col-lg-4">';
+        echo '      <div class="border rounded p-3">';
+        echo '        <div class="text-center">';
+// Check if "bookimage" key exists before accessing it
+if (isset($row["bookimage"])) {
+    echo '    <img src="' . $imagesDir . $row["bookimage"] . '" class="card-img-top" alt="Book Image">';
+} else {
+    echo '    <img src="bookimages/default_image.png" class="card-img-top" alt="Default Image">';
+}
+      echo '       <h5>' . $row["item_name"] . '</h5>';
+      echo '      <p class="mb-0">Book Price: RM ' . $row["item_price"] . '</p>';
+      echo '        </div>';
       echo '    </div>';
       echo '  </div>';
       echo '</div>';

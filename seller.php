@@ -22,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Retrieve form data
-    $userid = $_POST['userid'];
     $itemname = $_POST['itemname'];
     $itemtype = $_POST['itemtype'];
     $itemquantity = $_POST['itemquantity'];
@@ -30,6 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $itemprice = $_POST['itemprice'];
     $itemcategory = $_POST['itemcategory'];
     $email = $_SESSION['email'];
+
+    // Fetch the user ID from the database based on the logged-in user's email
+    $sql_user_id = "SELECT user_id FROM tbl_users WHERE user_email='$email'";
+    $result_user_id = $conn->query($sql_user_id);
+
+    if ($result_user_id->num_rows === 1) {
+        $row_user_id = $result_user_id->fetch_assoc();
+        $userid = $row_user_id['user_id'];
 
     // Handle file upload
     if (isset($_FILES['bookimage']) && $_FILES['bookimage']['error'] === UPLOAD_ERR_OK) {
@@ -65,18 +72,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // Insert the book data into the database
-    $sql = "INSERT INTO tbl_items (item_name, item_type, item_quantity, item_description, item_price, item_category, user_id) 
-            VALUES ('$itemname', '$itemtype', '$itemquantity', '$itemdescription', '$itemprice', '$itemcategory','$userid')";
+    // Insert the book data into the database with the user ID
+        $sql = "INSERT INTO tbl_items (item_name, item_type, item_quantity, item_description, item_price, item_category, user_id) 
+                VALUES ('$itemname', '$itemtype', '$itemquantity', '$itemdescription', '$itemprice', '$itemcategory','$userid')";
 
-    if ($conn->query($sql) === TRUE) {
-        // Book added successfully, redirect to the homepage
-        header("Location: homepage.php");
-        exit();
+        if ($conn->query($sql) === TRUE) {
+            // Book added successfully, redirect to the homepage
+            header("Location: homepage.php");
+            exit();
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        echo "User not found or multiple users with the same email.";
     }
-
     $conn->close();
 }
 ?>
@@ -128,11 +137,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </div>
               <div class="form-group">
                 <label for="bookname">Book Name:</label>
-                <input type="text" class="form-control" id="bookname" required>
+                <input type="text" class="form-control" id="bookname" name="itemname" required>
               </div>
               <div class="form-group">
                 <label for="booktype">Book Type:</label>
-                <select class="form-control" id="booktype" required>
+                <select class="form-control" id="booktype" name="itemtype" required>
                   <option value="">Select a book type</option>
                   <option value="fiction">Fiction</option>
                   <option value="non-fiction">Non-Fiction</option>
@@ -142,11 +151,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               </div>
               <div class="form-group">
                 <label for="bookquantity">Book Quantity:</label>
-                <input type="number" class="form-control" id="bookquantity" required>
+                <input type="number" class="form-control" id="bookquantity" name="itemquantity" required>
               </div>
               <div class="form-group">
                 <label for="bookdescription">Book Description:</label>
-                <textarea class="form-control" id="bookdescription" rows="3" required></textarea>
+                <textarea class="form-control" id="bookdescription" rows="3" name="itemdescription" required></textarea>
               </div>              
               <div class="form-group">
                 <label for="bookprice">Book Price:</label>
@@ -154,12 +163,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   <div class="input-group-prepend">
                     <span class="input-group-text">RM</span>
                   </div>
-                  <input type="text" class="form-control" id="bookprice" placeholder="Enter the book price" required>
+                  <input type="text" class="form-control" id="bookprice" name="itemprice" placeholder="Enter the book price" required>
                 </div>
               </div>
               <div class="form-group">
                 <label for="bookcategory">Book Category:</label>
-                <select class="form-control" id="bookcategory" required>
+                <select class="form-control" id="bookcategory" name="itemcategory" required>
                   <option value="">Select book category</option>
                   <option value="new">New</option>
                   <option value="secondhand">Second Hand</option>
@@ -183,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function hideMenu(){
         navLinks.style.right = "-200";
     }
-  </script>
+</script>
 
 </body>
 </html>
