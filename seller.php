@@ -41,15 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle file upload
     if (isset($_FILES['bookimage']) && $_FILES['bookimage']['error'] === UPLOAD_ERR_OK) {
       $targetDir = "bookimages/";
-      $targetFile = $targetDir . basename($_FILES["bookimage"]["name"]);
-      $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-  
+      $imageFileType = strtolower(pathinfo($_FILES["bookimage"]["name"], PATHINFO_EXTENSION));
+    
       // Check if the file is an image
       $check = getimagesize($_FILES["bookimage"]["tmp_name"]);
       if ($check === false) {
           echo "File is not an image.";
           exit();
-        }
+      }
 
         // Check if the file is a PNG image
         if ($imageFileType !== "png") {
@@ -62,19 +61,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Sorry, your file is too large.";
             exit();
         }
-        // Move the uploaded file to the target directory
-        if (!move_uploaded_file($_FILES["bookimage"]["tmp_name"], $targetFile)) {
-            echo "Sorry, there was an error uploading your file.";
-            exit();
-        }
-    } else {
-        echo "Image not uploaded.";
-        exit();
-    }
-
+  // Generate a unique name for the uploaded image using item_id
+  $newFileName = uniqid() . '.png';  // Assuming you want to save it with a .png extension
+  // Move the uploaded file to the target directory with the new name
+  if (!move_uploaded_file($_FILES["bookimage"]["tmp_name"], $targetDir . $newFileName)) {
+      echo "Sorry, there was an error uploading your file.";
+      exit();
+  }
+} else {
+  echo "Image not uploaded.";
+  exit();
+}
     // Insert the book data into the database with the user ID
-        $sql = "INSERT INTO tbl_items (item_name, item_type, item_quantity, item_description, item_price, item_category, user_id) 
-                VALUES ('$itemname', '$itemtype', '$itemquantity', '$itemdescription', '$itemprice', '$itemcategory','$userid')";
+        $sql = "INSERT INTO tbl_items (item_name, item_type, item_quantity, item_description, item_price, item_category, user_id, bookimage) 
+                VALUES ('$itemname', '$itemtype', '$itemquantity', '$itemdescription', '$itemprice', '$itemcategory','$userid', '$newFileName')";
 
         if ($conn->query($sql) === TRUE) {
             // Book added successfully, redirect to the homepage
@@ -107,16 +107,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
   <section class="header">
-    <nav>
+  <nav>
         <a href="homepage.php"><img src="images/logo.png"></a>
         <div class="nav-links">
             <i class="fa fa-tiems" onclick="hideMenu()"></i>
             <ul>
                 <li><a href="homepage.php">HOME</a></li>
-                <li><a href="login.php">LOGIN</a></li>
-                <li><a href="register.php">REGISTER</a></li>
                 <li><a href="seller.php">SELL</a></li>
-                <li><a href="feedback.php">FEEDBACK</a></li>
+                <li><a href="profile.php">PROFILE</a></li>
             </ul>
         </div>
         <i class="fa fa-bars" onclick="showMenu()"></i>
@@ -126,6 +124,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     </section>
 <section class="pengenalan">
+<div class="container mt-5">
+<form method="post" action="">
+<div class="form-group">
+        <label for="amount">Amount MYR (Malaysia):</label>
+        <input type="number" step="0.01" name="amount" required>
+        </div>
+            <div class="form-group">
+        <label for="currency">Target Currency:</label>
+        <select class="form-control" name="currency" required>
+            <option value="USD">USD (US)</option>
+            <option value="GBP">GBP (UK)</option>
+            <option value="JPY">JPY (Japan)</option>
+            <option value="EUR">EUR (European Union)</option>
+            <option value="AUD">AUD (Australia)</option>
+            <option value="CNY">CNY (China)</option>
+            <option value="SDG">SDG (Sudan)</option>
+            <option value="SGD">SGD (Singapore)</option>
+            <option value="THB">THB (Thailand)</option>
+            <option value="AED">AED (United Arad Emirates)</option>
+        </select>
+</div>
+<div class="mb-3">
+        <button type="submit" class="btn btn-primary">Calculate</button>
+</div>
+    </form>
+    <?php
+function get_exchange_rates($api_key, $base_currency) {
+    $url = "https://v6.exchangerate-api.com/v6/d2d530d5f497a25b9fb9b207/latest/{$base_currency}";
+    $response = file_get_contents($url);
+    
+    if ($response !== false) {
+        $data = json_decode($response, true);
+        return $data['conversion_rates'];
+    } else {
+        echo "Failed to retrieve exchange rates.";
+        return null;
+    }
+}
+
+function perform_money_exchange($amount, $exchange_rates, $target_currency) {
+    if (array_key_exists($target_currency, $exchange_rates)) {
+        $rate = $exchange_rates[$target_currency];
+        $exchanged_amount = $amount * $rate;
+        return array($exchanged_amount, $rate);
+    } else {
+        echo "Exchange rate for {$target_currency} not available.";
+        return array(null, null);
+    }
+}
+
+// Replace 'YOUR_API_KEY' with your actual API key
+$api_key = "d2d530d5f497a25b9fb9b207";
+$base_currency = "MYR";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get the user input from the form
+    $amount_myr = floatval($_POST["amount"]);
+    $target_currency = $_POST["currency"];
+
+// Step 1: Get exchange rates
+$exchange_rates = get_exchange_rates($api_key, $base_currency);
+
+if ($exchange_rates !== null) {
+    // Step 2: Perform the money exchange
+    list($exchanged_amount, $rate) = perform_money_exchange($amount_myr, $exchange_rates, $target_currency);
+    if ($exchanged_amount !== null) {
+        $exchanged_amount_formatted = number_format($exchanged_amount, 2);
+        echo "{$amount_myr} MYR is equivalent to {$exchanged_amount_formatted} {$target_currency} (Exchange rate: {$rate})";
+    }
+}
+}
+?>
+</div>
+<br><hr>
     <div class="container">
         <div class="row">
           <div class="col-md-6 offset-md-3">

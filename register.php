@@ -12,22 +12,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Retrieve form data
-  $name = $_POST['username'];
-  $email = $_POST['email'];
-  $password = $_POST['password'];
+$name = $_POST['username'];
+$email = $_POST['email'];
+$phonenumber = $_POST['phonenumber'];
+$address = $_POST['address'];
+$password = $_POST['password'];
 
-  // Insert user data into the database
-  $sql = "INSERT INTO tbl_users (user_name, user_email, user_password) VALUES ('$name', '$email', '$password')";
+// Insert user data into the database
+$sqlins = "INSERT INTO tbl_users (user_name, user_email, user_phone, user_address, user_password) VALUES ('$name', '$email', '$phonenumber', '$address', '$password')";
 
-  if ($conn->query($sql) === TRUE) {
+if ($conn->query($sqlins) === TRUE) {
     // Register successful
     $_SESSION['email'] = $email; // Store the user's email in the session
-    header("Location: homepage.php"); // Redirect to the homepage
+    header("Location: login.php"); // Redirect to the homepage
     exit();
-  } else {
-    echo "Register Failed";
-  }
-  $conn->close();
+} else {
+    echo "Register Failed: " . $conn->error;
+}
 }
 ?>
 
@@ -53,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
   <section class="header">
-    <nav>
+  <nav>
         <a href="homepage.php"><img src="images/logo.png"></a>
         <div class="nav-links">
             <i class="fa fa-tiems" onclick="hideMenu()"></i>
@@ -61,8 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <li><a href="homepage.php">HOME</a></li>
                 <li><a href="login.php">LOGIN</a></li>
                 <li><a href="register.php">REGISTER</a></li>
-                <li><a href="seller.php">SELL</a></li>
-                <li><a href="feedback.php">FEEDBACK</a></li>
             </ul>
         </div>
         <i class="fa fa-bars" onclick="showMenu()"></i>
@@ -82,8 +81,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" class="form-control" id="username" name="username" required placeholder="username">
               </div>
               <div class="form-group">
-                <label for="username">Email:</label>
+                <label for="email">Email:</label>
                 <input type="text" class="form-control" id="email" name="email" required placeholder="email">
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="text" class="form-control" id="phonenumber" name="phonenumber" required placeholder="phone number">
+              </div>
+              <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" class="form-control" id="address" name="address" required placeholder="address">
               </div>
               <div class="form-group">
                 <label for="password">Password:</label>

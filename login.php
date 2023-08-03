@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
   <section class="header">
-    <nav>
+  <nav>
         <a href="homepage.php"><img src="images/logo.png"></a>
         <div class="nav-links">
             <i class="fa fa-tiems" onclick="hideMenu()"></i>
@@ -66,8 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <li><a href="homepage.php">HOME</a></li>
                 <li><a href="login.php">LOGIN</a></li>
                 <li><a href="register.php">REGISTER</a></li>
-                <li><a href="seller.php">SELL</a></li>
-                <li><a href="feedback.php">FEEDBACK</a></li>
             </ul>
         </div>
         <i class="fa fa-bars" onclick="showMenu()"></i>

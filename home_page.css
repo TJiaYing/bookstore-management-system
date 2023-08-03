@@ -23,25 +23,8 @@ p{
     background-size: cover;
     position: relative;
 }
-.login-page{
-    min-height: 100vh;
-    width: 100%;
-    background-image: linear-gradient(rgba(4,9,30,0.7),rgba(4,9,30,0.7)),url(images/login.jpg);
-    background-position: center;
-    background-size: cover;
-    position: relative;
-}
-.register-page{
-    min-height: 100vh;
-    width: 100%;
-    background-image: linear-gradient(rgba(4,9,30,0.7),rgba(4,9,30,0.7)),url(images/register.jpg);
-    background-position: center;
-    background-size: cover;
-    position: relative;
-}
 nav{
     display: flex;
-    padding: 2%, 6%;
     justify-content: space-between;
     align-items: center;
 }
@@ -85,7 +68,6 @@ nav img{
     transform: translate(-50%,-50%);
     text-align: center;
     border-radius: 10px;
-    padding: 20px;
 }
 .text-box h1{
     font-size: 72px;
@@ -116,68 +98,28 @@ nav img{
     top: 0;
     left: 0;
 }
-#suggestionList{
-    margin-top: 20px;
-}
-#suggestions{
-    border-collapse: collapse;
-    width: 100%;
-}
-#suggestions th, #suggestions td{
-    border: 1px solid black;
-    padding: 8px;
-    text-align: center;
-}
-#suggestions th:first-child,
-#suggestions td:first-child {
-    width: 50px; 
-}
-#suggestion th{
-     background-color: #f2f2f2;
-}
-form label{
-    margin: 10px;
-}
-.button-row {
+
+.profile-container {
+    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-}
-.button-row button{
-    align-items: center;
-    margin: 10px;
-    padding: 5px;
-    background-color: pink;
-}
-.button-submit{
-    align-items: center;
-    gap: 10px;
-    margin: 10px;
-}
-.button-submit button{
-    align-items: center;
-    padding: 5px;
-    background-color: pink;
+    height: 50vh;
 }
 
-#backToTopBtn {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 99;
-    font-size: 18px;
-    border: none;
-    outline: none;
-    background-color: #f596f1;
-    color: white;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-  }
-  #backToTopBtn i {
-    display: inline-block;
-    vertical-align: middle;
-  }
-  #backToTopBtn:hover {
-    background-color: #333;
-  }
+.profile-info {
+    background-color: #f8ff92;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    text-align: center;
+    font-family: 'Shantell Sans', sans-serif;
+}
+
+.profile-info p {
+    margin: 8px 0;
+}
+
+.profile-info strong {
+    font-weight: bold;
+}
